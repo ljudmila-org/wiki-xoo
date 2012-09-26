@@ -543,6 +543,9 @@ class Preprocessor_DOM implements Preprocessor {
 						'open' => $curChar,
 						'close' => $rule['end'],
 						'count' => $count,
+/*** START HACK ***/
+						'startPos' => $i,
+/*** END HACK ***/						
 						'lineStart' => ($i > 0 && $text[$i-1] == "\n"),
 					);
 
@@ -603,7 +606,9 @@ class Preprocessor_DOM implements Preprocessor {
 					} else {
 						$attr = '';
 					}
-
+/* START HACK */					
+					$attr .= ' start="' . $piece->startPos . '" end="' . ($i+$count) . '"';
+/* END HACK */
 					$element = "<$name$attr>";
 					$element .= "<title>$title</title>";
 					$argIndex = 1;
@@ -942,8 +947,36 @@ class PPFrame_DOM implements PPFrame {
 				}
 			}
 		}
-		return new PPTemplateFrame_DOM( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title );
+		return new PPTemplateFrame_DOM( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title, $args );
 	}
+	
+## START HACK
+	
+	/**
+	 * Create a new child frame with custom arguments
+	 * $args is an array containing the template arguments as text
+	 */
+	function newCustomChild( $args = false, $title = false ) {
+		$namedArgs = array();
+		$numberedArgs = array();
+		if ( $title === false ) {
+			$title = $this->title;
+		}
+		if ( $args !== false ) {
+			foreach ( $args as $key=>$val ) {
+				if ( is_numeric($key) ) {
+					// Numbered parameter
+					$numberedArgs[$key] = $val;
+				} else {
+					// Named parameter
+					$namedArgs[$key] = $val;
+				}
+			}
+		}
+		return new PPTemplateFrame_DOM( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title, $args );
+	}
+
+## END HACK
 
 	/**
 	 * @throws MWException
@@ -1036,10 +1069,19 @@ class PPFrame_DOM implements PPFrame {
 						$newIterator = $this->virtualBracketedImplode( '{{', '|', '}}', $title, $parts );
 					} else {
 						$lineStart = $contextNode->getAttribute( 'lineStart' );
+/*** START HACK ***/							
+						$startPos = $contextNode->getAttribute( 'start' );
+						$endPos = $contextNode->getAttribute( 'end' );
+/*** END HACK ***/							
 						$params = array(
 							'title' => new PPNode_DOM( $title ),
 							'parts' => new PPNode_DOM( $parts ),
-							'lineStart' => $lineStart );
+							'lineStart' => $lineStart,
+/*** START HACK ***/							
+              'startPos' => $startPos,
+              'endPos' => $endPos
+/*** END HACK ***/							
+						);
 						$ret = $this->parser->braceSubstitution( $params, $this );
 						if ( isset( $ret['object'] ) ) {
 							$newIterator = $ret['object'];

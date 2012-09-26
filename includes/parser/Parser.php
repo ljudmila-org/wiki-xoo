@@ -344,7 +344,7 @@ class Parser {
 		wfRunHooks( 'ParserAfterStrip', array( &$this, &$text, &$this->mStripState ) );
 		$text = $this->internalParse( $text );
 
-		$text = $this->mStripState->unstripGeneral( $text );
+#		$text = $this->mStripState->unstripGeneral( $text );
 
 		# Clean up special characters, only run once, next-to-last before doBlockLevels
 		$fixtags = array(
@@ -358,6 +358,10 @@ class Parser {
 		$text = preg_replace( array_keys( $fixtags ), array_values( $fixtags ), $text );
 
 		$text = $this->doBlockLevels( $text, $linestart );
+## HACK START
+# only once and last
+		$text = $this->mStripState->unstripGeneral( $text );
+## HACK END
 
 		$this->replaceLinkHolders( $text );
 
@@ -3080,6 +3084,10 @@ class Parser {
 		$args = ( null == $piece['parts'] ) ? array() : $piece['parts'];
 		wfProfileOut( __METHOD__.'-setup' );
 
+## START HACK
+		wfRunHooks( 'BeforeBraceSubstitution', array( &$parser, &$originalTitle, &$args) );
+## END HACK
+
 		$titleProfileIn = null; // profile templates
 
 		# SUBST
@@ -3336,6 +3344,10 @@ class Parser {
 		if ( $isChildObj ) {
 			# Clean up argument array
 			$newFrame = $frame->newChild( $args, $title );
+/* START HACK */			
+			$newFrame->startPos = $piece['startPos'];
+			$newFrame->endPos = $piece['endPos'];
+/* END HACK */			
 
 			if ( $nowiki ) {
 				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG );
@@ -3365,7 +3377,9 @@ class Parser {
 		# Add a blank line preceding, to prevent it from mucking up
 		# immediately preceding headings
 		if ( $isHTML ) {
-			$text = "\n\n" . $this->insertStripItem( $text );
+## START HACK
+			$text =  $this->insertStripItem( $text );
+## END HACK
 		} elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
 			# Escape nowiki-style return values
 			$text = wfEscapeWikiText( $text );
@@ -3399,6 +3413,9 @@ class Parser {
 		} else {
 			$ret = array( 'text' => $text );
 		}
+## START HACK
+		wfRunHooks( 'AfterBraceSubstitution', array( &$parser, &$originalTitle) );
+## END HACK
 
 		wfProfileOut( __METHOD__ );
 		return $ret;
@@ -3413,6 +3430,12 @@ class Parser {
 	 * @return array
 	 */
 	function getTemplateDom( $title ) {
+## START HACK	
+		wfRunHooks( 'BeforeGetTemplateDom', array( &$this, &$title, &$dom) );
+## END HACK
+
+		if ($dom) return array($dom,$title);
+
 		$cacheTitle = $title;
 		$titleText = $title->getPrefixedDBkey();
 
@@ -3662,6 +3685,14 @@ class Parser {
 		$parts = $piece['parts'];
 		$nameWithSpaces = $frame->expand( $piece['title'] );
 		$argName = trim( $nameWithSpaces );
+
+## START HACK
+		$result = false;
+		$success = wfRunHooks('BeforeArgSubstitution',array(&$this,&$frame,&$piece['title'],&$argName,&$parts,&$result));
+		if ($result!==false) return $result;
+## END HACK
+
+
 		$object = false;
 		$text = $frame->getArgument( $argName );
 		if (  $text === false && $parts->getLength() > 0
@@ -3691,6 +3722,12 @@ class Parser {
 		} else {
 			$ret = array( 'text' => $text );
 		}
+
+## START HACK
+		$result = false;
+		$success = wfRunHooks('AfterArgSubstitution',array(&$this,&$frame,&$ret,&$result));
+		if ($result!==false) return $result;
+## END HACK
 
 		wfProfileOut( __METHOD__ );
 		return $ret;

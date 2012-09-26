@@ -418,7 +418,9 @@ class Preprocessor_Hash implements Preprocessor {
 						'open' => "\n",
 						'close' => "\n",
 						'parts' => array( new PPDPart_Hash( str_repeat( '=', $count ) ) ),
+/*** START HACK ***/
 						'startPos' => $i,
+/*** END HACK ***/						
 						'count' => $count );
 					$stack->push( $piece );
 					$accum =& $stack->getAccum();
@@ -498,6 +500,7 @@ class Preprocessor_Hash implements Preprocessor {
 						'open' => $curChar,
 						'close' => $rule['end'],
 						'count' => $count,
+						'startPos' => $i,
 						'lineStart' => ($i > 0 && $text[$i-1] == "\n"),
 					);
 
@@ -552,6 +555,11 @@ class Preprocessor_Hash implements Preprocessor {
 					unset( $parts[0] );
 
 					$element = new PPNode_Hash_Tree( $name );
+/* START HACK */					
+					$element->addChild( new PPNode_Hash_Attr( 'startPos', $piece->startPos ) );
+					$element->addChild( new PPNode_Hash_Attr( 'endPos', $i+$count) );
+/* END HACK */
+
 
 					# The invocation is at the start of the line if lineStart is set in
 					# the stack, and all opening brackets are used up.
@@ -899,8 +907,42 @@ class PPFrame_Hash implements PPFrame {
 				}
 			}
 		}
-		return new PPTemplateFrame_Hash( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title );
+		return new PPTemplateFrame_Hash( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title, $args );
 	}
+
+## START HACK
+	
+	/**
+	 * Create a new child frame with custom arguments
+	 * $args is an array containing the template arguments as text
+	 */
+	function newCustomChild( $args = false, $title = false ) {
+		$namedArgs = array();
+		$numberedArgs = array();
+		if ( $title === false ) {
+			$title = $this->title;
+		}
+		if ( is_array($args)) {
+			foreach ( $args as $key=>$val ) {
+				if ( is_numeric($key) ) {
+					// Numbered parameter
+					$numberedArgs[$key] = $val;
+				} else {
+					// Named parameter
+					$namedArgs[$key] = $val;
+				}
+			}
+		} else {
+			trigger_error(gettype($args).'there');
+//			debug_print_backtrace();
+//			die("<pre>here\n".);
+		}
+		return new PPTemplateFrame_Hash( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title, $args );
+	}
+
+## END HACK
+
+
 
 	/**
 	 * @throws MWException
@@ -1681,7 +1723,15 @@ class PPNode_Hash_Tree implements PPNode {
 			if ( $child->name == 'lineStart' ) {
 				$bits['lineStart'] = '1';
 			}
+/* START HACK */			
+			if ( $child->name == 'startPos' ) {
+				$bits['startPos'] = $child->value;
+			}
+			if ( $child->name == 'endPos' ) {
+				$bits['endPos'] = $child->value;
+			}
 		}
+/* END HACK */			
 		if ( !isset( $bits['title'] ) ) {
 			throw new MWException( 'Invalid node passed to ' . __METHOD__ );
 		}

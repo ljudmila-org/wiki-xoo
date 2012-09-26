@@ -298,17 +298,58 @@ abstract class Skin extends ContextSource {
 	 * @param $out OutputPage
 	 */
 	abstract function outputPage( OutputPage $out = null );
+/*
+####
+# START HACK 
+####
+		// See self::afterContentHook() for documentation
+		$afterContent = $this->afterContentHook();
+		$ret ='';
+		$ret .= ( $out->headElement( $this ) );
+
+
+		$ret .=( "\n<body" );
+		$ops = $this->getBodyOptions();
+		foreach ( $ops as $name => $val ) {
+			$ret .=( " $name='$val'" );
+		}
+		$ret .=( ">\n" );
+		if ( $wgDebugComments ) {
+			$ret .= ( "<!-- Wiki debugging output:\n" .
+			  $out->mDebugtext . "-->\n" );
+		}
+
+		$ret .=( $this->beforeContent() );
+
+		$ret .=( $out->mBodytext . "\n" );
+
+		$ret .=( $this->afterContent() );
+		
+		$ret .=( $afterContent );
+
+		$ret .=( $this->bottomScripts() );
+
+		$ret .=( wfReportTime() );
+
+		$ret .=( "\n</body></html>" );
+		wfRunHooks( 'AfterOutputPage', array(&$ret) );
+		$out->out($ret);
+####
+# END HACK
+####
+*/
 
 	/**
 	 * @param $data array
 	 * @return string
 	 */
+
 	static function makeVariablesScript( $data ) {
 		if ( $data ) {
 			return Html::inlineScript(
 				ResourceLoader::makeLoaderConditionalScript( ResourceLoader::makeConfigSetScript( $data ) )
 			);
-		} else {
+  	} else {
 			return '';
 		}
 	}

@@ -1969,6 +1969,13 @@ class OutputPage extends ContextSource {
 
 		if ( $this->mArticleBodyOnly ) {
 			$this->out( $this->mBodytext );
+#####
+#  START HACK
+#####
+			wfRunHooks( 'AfterOutputPage', array(&$this->mBodytext) );
+#####
+#  END HACK
+#####
 		} else {
 			$this->addDefaultModules();
 
@@ -2829,6 +2836,7 @@ $templates
 	 * have to be purged on configuration changes.
 	 * @return array
 	 */
+
 	public function getJSVars() {
 		global $wgUseAjax, $wgEnableMWSuggest;
 

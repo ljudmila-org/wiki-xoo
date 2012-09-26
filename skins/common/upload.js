@@ -83,7 +83,7 @@ function uploadSetup() {
 		len = uploadSourceIds.length;
 	for ( i = 0; i < len; i += 1 )
 		document.getElementById( uploadSourceIds[i] ).onchange = function (e) {
-			fillDestFilename( this.id );
+			//fillDestFilename( this.id );
 		};
 };
 

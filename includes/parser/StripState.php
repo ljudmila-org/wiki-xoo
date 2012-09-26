@@ -20,7 +20,8 @@ class StripState {
 			'nowiki' => array(),
 			'general' => array()
 		);
-		$this->regex = "/{$this->prefix}([^\x7f]+)" . Parser::MARKER_SUFFIX . '/';
+//		$this->regex = "/{$this->prefix}([^\x7f]+)" . Parser::MARKER_SUFFIX . '/';
+		$this->regex = "/\x7fUNIQ.{16}([^\x7f]+)" . Parser::MARKER_SUFFIX . '/';
 	}
 
 	/**
@@ -48,7 +49,7 @@ class StripState {
 	 */
 	protected function addItem( $type, $marker, $value ) {
 		if ( !preg_match( $this->regex, $marker, $m ) ) {
-			throw new MWException( "Invalid marker: $marker" );
+			throw new MWException( "Invalid marker: $marker :: ".$this->regex );
 		}
 
 		$this->data[$type][$m[1]] = $value;
