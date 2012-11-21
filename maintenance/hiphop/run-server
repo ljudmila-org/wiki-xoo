@@ -1,7 +1,7 @@
 #!/usr/bin/hphpi -f
 <?php
 
-require( dirname( __FILE__ ) . '/../Maintenance.php' );
+require_once( dirname( __FILE__ ) . '/../Maintenance.php' );
 
 class RunHipHopServer extends Maintenance {
 	function __construct() {

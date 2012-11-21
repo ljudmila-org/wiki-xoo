@@ -16,11 +16,19 @@ class IPTC {
 	* @return Array iptc metadata array
 	*/
 	static function parse( $rawData ) {
-		$parsed = iptcparse( $rawData );
-		$data = Array();
-		if (!is_array($parsed)) {
-				return $data;
+//START HACK
+    return array();
+	  try {
+//END HACK	  
+		  $parsed = iptcparse( $rawData );
+//START HACK
+		} catch(Error $e) {
 		}
+//END HACK	  
+	  $data = Array();
+	  if (!is_array($parsed)) {
+			  return $data;
+	  }
 
 		$c = '';
 		//charset info contained in tag 1:90.

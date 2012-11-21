@@ -3351,7 +3351,9 @@ class Parser {
 
 			if ( $nowiki ) {
 				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG );
-			} elseif ( $titleText !== false && $newFrame->isEmpty() ) {
+/* START HACK */			
+			} elseif ( false && $titleText !== false && $newFrame->isEmpty() ) {
+/* END HACK */			
 				# Expansion is eligible for the empty-frame cache
 				if ( isset( $this->mTplExpandCache[$titleText] ) ) {
 					$text = $this->mTplExpandCache[$titleText];

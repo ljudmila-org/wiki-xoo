@@ -4,7 +4,7 @@
  * @file
  */
 
-require( dirname( __FILE__ ) . '/Maintenance.php' );
+require_once( dirname( __FILE__ ) . '/Maintenance.php' );
 
 class PurgeParserCache extends Maintenance {
 	var $lastProgress;
