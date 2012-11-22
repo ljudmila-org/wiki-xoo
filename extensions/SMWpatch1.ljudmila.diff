@@ -1,0 +1,21 @@
+Index: includes/storage/SMW_SQLStore2_Queries.php
+===================================================================
+--- includes/storage/SMW_SQLStore2_Queries.php	(revision 115055)
++++ includes/storage/SMW_SQLStore2_Queries.php	(working copy)
+@@ -1145,6 +1145,9 @@
+ 	 */
+ 	protected function getCreateTempIDTableSQL( $tablename ) {
+ 		global $wgDBtype;
++/** BEGIN HACK **/		
++		$tablename = preg_replace('/(^"|"$)/','',$tablename);
++/** END HACK **/		
+ 
+ 		if ( $wgDBtype == 'postgres' ) { // PostgreSQL: no memory tables, use RULE to emulate INSERT IGNORE
+ 			return "CREATE OR REPLACE FUNCTION create_" . $tablename . "() RETURNS void AS "
+@@ -1166,4 +1169,4 @@
+ 		}
+ 	}
+ 
+-}
+\ No newline at end of file
++}

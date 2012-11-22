@@ -73,6 +73,9 @@ class RunJobs extends Maintenance {
 				if ( !$job ) {
 					break;
 				}
+//START HACK				
+				$this->runJobsLog( $job->toString() . " $n" );
+//END HACK				
 
 				wfWaitForSlaves();
 				$t = microtime( true );
@@ -81,9 +84,13 @@ class RunJobs extends Maintenance {
 				$t = microtime( true ) - $t;
 				$timeMs = intval( $t * 1000 );
 				if ( !$status ) {
-					$this->runJobsLog( $job->toString() . " t=$timeMs error={$job->error}" );
+//START HACK				
+					$this->runJobsLog("fail t=$timeMs error={$job->error}" );
+//END HACK				
 				} else {
-					$this->runJobsLog( $job->toString() . " t=$timeMs good" );
+//START HACK				
+					$this->runJobsLog("done t=$timeMs good" );
+//END HACK				
 				}
 
 				if ( $maxJobs && ++$n > $maxJobs ) {
