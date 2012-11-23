@@ -709,6 +709,7 @@ function fl_prop (&$P, $F, $A)
 		switch ($args->command)	
 		{
 		case 'set':
+		  return "";
 			if ($args->count != 2 ) return $this->notFound();
 			$prop = $args->trimExpand(1);
 			$value = $args->trimExpand(2);
@@ -716,6 +717,7 @@ function fl_prop (&$P, $F, $A)
 			$P->mOutput->setProperty("{$prop}__StripState__",serialize($P->mStripState));
 			return "";
 		case 'get':	
+		  return "";
 			if ($args->count < 2 || $args->count > 3) return $this->notFound();
 			$t = $args->trimExpand(1);
 			if ($t==='') $title = $P->mTitle;
@@ -1012,7 +1014,29 @@ function fl_prop (&$P, $F, $A)
 				$newArray[$key]=$this->arrMake($val);
 			}
 			return $this->arrMake($newArray);
-		
+		case 'encodepairs':
+			if ($args->count!=1 ) return array('found'=>false);
+			$id  = $args->trimExpand(1);
+			if (!$this->arrExists($id)) return array('found'=>false);
+
+		  $pairs = array();
+			$oldArray=$this->getArray($id);
+		  foreach ($oldArray as $k=>$v) {
+		    $pairs[]=$this->arrMake(array('name'=>$k,'value'=>$v));
+		  }
+		  return $this->arrMake($pairs);
+		case 'decodepairs':
+			if ($args->count!=1 ) return array('found'=>false);
+			$id  = $args->trimExpand(1);
+			if (!$this->arrExists($id)) return array('found'=>false);
+
+			$pairs=$this->getArray($id);
+			$newArray = array();
+		  foreach ($pairs as $p) {
+		    $pair = $this->getArray($p);
+		    $newArray[$pair['name']]=$pair['value'];
+		  }
+		  return $this->arrMake($newArray);
 		case 'foreach':
 		case 'for each':
 			if( $args->count != 3 ) return array( 'found' => false );

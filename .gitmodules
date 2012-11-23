@@ -4,3 +4,9 @@
 [submodule "extensions/ParserFunctions"]
 	path = extensions/ParserFunctions
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git
+[submodule "extensions/SemanticMediaWiki"]
+	path = extensions/SemanticMediaWiki
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticMediaWiki.git
+[submodule "extensions/SemanticResultFormats"]
+	path = extensions/SemanticResultFormats
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticResultFormats.git

@@ -20,8 +20,8 @@ class StripState {
 			'nowiki' => array(),
 			'general' => array()
 		);
-//		$this->regex = "/{$this->prefix}([^\x7f]+)" . Parser::MARKER_SUFFIX . '/';
-		$this->regex = "/\x7fUNIQ.{16}([^\x7f]+)" . Parser::MARKER_SUFFIX . '/';
+		$this->regex = "/{$this->prefix}([^\x7f]+)" . Parser::MARKER_SUFFIX . '/';
+//		$this->regex = "/\x7fUNIQ.{16}([^\x7f]+)" . Parser::MARKER_SUFFIX . '/';
 	}
 
 	/**

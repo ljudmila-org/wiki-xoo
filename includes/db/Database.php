@@ -2353,9 +2353,16 @@ abstract class DatabaseBase implements DatabaseType {
 		foreach( $rows as $row ) {
 			# Delete rows which collide
 			if ( $uniqueIndexes ) {
+			        # Single index case
+			   	if ( !is_array( $uniqueIndexes ) ) {
+					$uniqueIndexes = array( $uniqueIndexes );
+				}			
+
+
 				$sql = "DELETE FROM $quotedTable WHERE ";
 				$first = true;
 				foreach ( $uniqueIndexes as $index ) {
+					$sql .= " /*$index*/ ";
 					if ( $first ) {
 						$first = false;
 						$sql .= '( ';
